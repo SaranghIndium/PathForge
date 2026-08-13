@@ -62,6 +62,9 @@ MonoBehaviour:
   _money: 10
   _lineManager: {fileID: 8253618541472653865}
   _linesParent: {fileID: 8237967344598688662}
+  _backgroundSprite: {fileID: 0}
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  _backgroundSortingOrder: -10
 --- !u!1 &2837266096709259451
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,7 +246,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6245650384963763403
 Transform:
   m_ObjectHideFlags: 0
@@ -287,6 +290,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -308,9 +313,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &7159275398082964930
 GameObject:
@@ -382,6 +389,10 @@ PrefabInstance:
       propertyPath: _arrayPool
       value: 
       objectReference: {fileID: 5000651016614165200}
+    - target: {fileID: 4594035126425610268, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
     - target: {fileID: 4852218959071952598, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
       propertyPath: m_Name
       value: Line (3)
@@ -525,6 +536,10 @@ PrefabInstance:
       propertyPath: destroyDelay
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1088355798733759430, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2728101366424247942, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
       propertyPath: lr
       value: 
@@ -537,6 +552,10 @@ PrefabInstance:
       propertyPath: _arrayPool
       value: 
       objectReference: {fileID: 5000651016614165200}
+    - target: {fileID: 4594035126425610268, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
     - target: {fileID: 4852218959071952598, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
       propertyPath: m_Name
       value: Line (1)
@@ -704,6 +723,10 @@ PrefabInstance:
       propertyPath: _arrayPool
       value: 
       objectReference: {fileID: 5000651016614165200}
+    - target: {fileID: 4594035126425610268, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
     - target: {fileID: 4852218959071952598, guid: 5134ca6e224a9b84b8bd86f152cf67fc, type: 3}
       propertyPath: m_Name
       value: Line (2)

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Utilities;
+using System.Linq;
 
 namespace SerapKeremGameKit._Managers
 {
@@ -14,6 +15,8 @@ namespace SerapKeremGameKit._Managers
         #region Properties & Data Access
 
         private const string ProgressKey = PreferencesKeys.ProgressData;
+        private const string AuthoredLevelsResourcePath = "Levels";
+        private const int AuthoredLevelCount = 10;
         public int ActiveLevelNumber
         {
             get => PlayerPrefs.GetInt(ProgressKey, 1);
@@ -28,6 +31,9 @@ namespace SerapKeremGameKit._Managers
 
         [Tooltip("If disabled, level prefab selection remains deterministic even after authored prefab count is exceeded.")]
         [SerializeField] private bool _randomizePrefabAfterAuthoredRange = false;
+
+        [Tooltip("Load and use authored level prefabs from Resources/Levels for deterministic level order.")]
+        [SerializeField] private bool _useAuthoredResourceLevels = true;
 
         [Title("Level Collections")]
         [ListDrawerSettings(Draggable = true, AlwaysExpanded = false)]
@@ -51,6 +57,10 @@ namespace SerapKeremGameKit._Managers
         protected override void Awake()
         {
             base.Awake();
+            if (_levels == null || _levels.Length == 0)
+            {
+                TryLoadAuthoredLevelsFromResources();
+            }
             PerformInitialValidation();
         }
 
@@ -94,9 +104,6 @@ namespace SerapKeremGameKit._Managers
         {
             if (progressValue <= totalAvailable)
                 return progressValue;
-
-            if (_useRandomSelection && _randomizePrefabAfterAuthoredRange)
-                return GetRandomIndex(totalAvailable);
 
             return WrapIndex(progressValue, totalAvailable);
         }
@@ -227,6 +234,49 @@ namespace SerapKeremGameKit._Managers
         {
             if (_levels == null || _levels.Length == 0)
                 TraceLogger.LogWarning($"{name}: Levels array is not configured.", this);
+        }
+
+        private void TryLoadAuthoredLevelsFromResources()
+        {
+            if (!_useAuthoredResourceLevels)
+                return;
+
+            Level[] resourceLevels = Resources.LoadAll<Level>(AuthoredLevelsResourcePath);
+            if (resourceLevels == null || resourceLevels.Length == 0)
+            {
+                TraceLogger.LogWarning($"{name}: No level prefabs found under Resources/{AuthoredLevelsResourcePath}.", this);
+                return;
+            }
+
+            var orderedLevels = resourceLevels
+                .Where(level => level != null)
+                .OrderBy(level => ExtractTrailingNumber(level.name))
+                .ThenBy(level => level.name)
+                .Take(AuthoredLevelCount)
+                .ToArray();
+
+            if (orderedLevels.Length == 0)
+                return;
+
+            _levels = orderedLevels;
+            _useRandomSelection = false;
+            _randomizePrefabAfterAuthoredRange = false;
+        }
+
+        private int ExtractTrailingNumber(string levelName)
+        {
+            if (string.IsNullOrEmpty(levelName))
+                return int.MaxValue;
+
+            int lastSpaceIndex = levelName.LastIndexOf(' ');
+            if (lastSpaceIndex < 0 || lastSpaceIndex >= levelName.Length - 1)
+                return int.MaxValue;
+
+            string trailing = levelName.Substring(lastSpaceIndex + 1);
+            if (int.TryParse(trailing, out int parsed))
+                return parsed;
+
+            return int.MaxValue;
         }
 
         private void ConfigureEnvironment()

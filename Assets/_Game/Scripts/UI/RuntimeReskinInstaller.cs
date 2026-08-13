@@ -53,7 +53,6 @@ namespace _Game.UI
             if (!scene.IsValid()) return;
 
             ApplyCameraReskin();
-            ApplyUIReskin();
         }
 
         private void ApplyCameraReskin()
@@ -65,77 +64,5 @@ namespace _Game.UI
             mainCamera.backgroundColor = _cameraBackground;
         }
 
-        private void ApplyUIReskin()
-        {
-            Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            for (int i = 0; i < canvases.Length; i++)
-            {
-                RestyleCanvas(canvases[i]);
-            }
-        }
-
-        private void RestyleCanvas(Canvas canvas)
-        {
-            if (canvas == null) return;
-
-            Image[] images = canvas.GetComponentsInChildren<Image>(true);
-            for (int i = 0; i < images.Length; i++)
-            {
-                RestyleImage(images[i]);
-            }
-
-            Button[] buttons = canvas.GetComponentsInChildren<Button>(true);
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                RestyleButton(buttons[i]);
-            }
-
-            TextMeshProUGUI[] textElements = canvas.GetComponentsInChildren<TextMeshProUGUI>(true);
-            for (int i = 0; i < textElements.Length; i++)
-            {
-                RestyleText(textElements[i]);
-            }
-        }
-
-        private void RestyleImage(Image image)
-        {
-            if (image == null) return;
-            if (image.GetComponent<HeartUI>() != null) return;
-
-            string objectName = image.gameObject.name;
-            bool isPanelLike = objectName.Contains("Panel") || objectName.Contains("Container") || objectName.Contains("Background");
-            if (isPanelLike)
-            {
-                image.color = _uiPanelColor;
-            }
-        }
-
-        private void RestyleButton(Button button)
-        {
-            if (button == null) return;
-
-            Image image = button.GetComponent<Image>();
-            if (image != null)
-            {
-                image.color = _buttonColor;
-            }
-
-            ColorBlock colors = button.colors;
-            colors.normalColor = _buttonColor;
-            colors.highlightedColor = _buttonHighlightColor;
-            colors.selectedColor = _buttonHighlightColor;
-            colors.pressedColor = Color.Lerp(_buttonColor, Color.black, 0.2f);
-            colors.disabledColor = new Color(0.3f, 0.35f, 0.45f, 0.8f);
-            colors.fadeDuration = 0.08f;
-            button.colors = colors;
-        }
-
-        private void RestyleText(TextMeshProUGUI text)
-        {
-            if (text == null) return;
-
-            text.color = _uiTextColor;
-            text.fontStyle = FontStyles.Bold;
-        }
     }
 }

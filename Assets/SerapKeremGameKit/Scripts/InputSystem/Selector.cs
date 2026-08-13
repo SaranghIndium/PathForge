@@ -65,7 +65,9 @@ namespace SerapKeremGameKit._InputSystem
 
         private void Handle2DSelection(Vector3 screenPos)
         {
-            Vector3 mouseWorldPos = _mainCamera.ScreenToWorldPoint(screenPos);
+            Vector3 screenPosWithDepth = screenPos;
+            screenPosWithDepth.z = Mathf.Abs(_mainCamera.transform.position.z);
+            Vector3 mouseWorldPos = _mainCamera.ScreenToWorldPoint(screenPosWithDepth);
             mouseWorldPos.z = 0f;
 
             Collider2D hitCollider = Physics2D.OverlapPoint(mouseWorldPos, _selectableLayerMash);
@@ -176,7 +178,15 @@ namespace SerapKeremGameKit._InputSystem
 
         private bool IsPointerOverUI()
         {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            if (EventSystem.current == null)
+                return false;
+
+            if (Input.touchCount > 0)
+            {
+                return EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId);
+            }
+
+            return EventSystem.current.IsPointerOverGameObject();
         }
 
         private void DrawDebugRay(Ray ray, float distance, Color color)

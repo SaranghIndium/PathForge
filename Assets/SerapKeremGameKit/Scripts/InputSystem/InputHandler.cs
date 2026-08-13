@@ -17,6 +17,7 @@ namespace SerapKeremGameKit._InputSystem
         protected override void Awake()
         {
             base.Awake();
+            Input.simulateMouseWithTouches = false;
 
             //if (LoadingPanelController.Instance)
             //{
@@ -29,7 +30,43 @@ namespace SerapKeremGameKit._InputSystem
         {
             if (_isInputLocked) return; // Skip processing if input is locked
             _playerInput.ResetFrame();
-            ProcessMouseInput();
+
+            if (Input.touchCount > 0)
+            {
+                ProcessTouchInput();
+            }
+            else
+            {
+                ProcessMouseInput();
+            }
+        }
+
+        private void ProcessTouchInput()
+        {
+            Touch touch = Input.GetTouch(0);
+            Vector3 touchPosition = touch.position;
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    HandleMouseDown(touchPosition);
+                    break;
+                case TouchPhase.Moved:
+                case TouchPhase.Stationary:
+                    if (_playerInput.Held)
+                    {
+                        HandleMouseHeld(touchPosition);
+                    }
+                    else
+                    {
+                        HandleMouseDown(touchPosition);
+                    }
+                    break;
+                case TouchPhase.Ended:
+                case TouchPhase.Canceled:
+                    HandleMouseUp(touchPosition);
+                    break;
+            }
         }
 
         private void ProcessMouseInput()

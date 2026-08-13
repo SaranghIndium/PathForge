@@ -46,6 +46,26 @@ namespace _Game.Line
         {
             if (_lineRenderer == null)
             {
+                _lineRenderer = GetComponent<LineRenderer>();
+            }
+
+            if (_materialHandler == null)
+            {
+                _materialHandler = GetComponent<LineMaterialHandler>();
+            }
+
+            if (_lineHead == null)
+            {
+                _lineHead = GetComponentInChildren<LineRendererHead>(true);
+            }
+
+            if (_lineHeadSpriteRenderer == null && _lineHead != null)
+            {
+                _lineHeadSpriteRenderer = _lineHead.GetComponent<SpriteRenderer>();
+            }
+
+            if (_lineRenderer == null)
+            {
                 TraceLogger.LogError($"{name} requires LineRenderer component.", this);
             }
         }
@@ -91,6 +111,11 @@ namespace _Game.Line
             InjectDependencies();
             SubscribeToEvents();
             AddHeadToMaterialHandler();
+
+            if (_lineRenderer != null)
+            {
+                _lineRenderer.useWorldSpace = false;
+            }
 
             IsInitialized = true;
 

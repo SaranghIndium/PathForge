@@ -139,11 +139,9 @@ MonoBehaviour:
   _money: 38
   _lineManager: {fileID: 1366648070039350808}
   _linesParent: {fileID: 8948642282210414837}
-  _useProceduralProgression: 0
-  _simpleLevelCount: 5
-  _playAreaSize: {x: 10, y: 8}
-  _smallSquareSize: 1.2
-  _gridStep: 0.8
+  _backgroundSprite: {fileID: 0}
+  _backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  _backgroundSortingOrder: -10
 --- !u!1 &8710063004081007945
 GameObject:
   m_ObjectHideFlags: 0

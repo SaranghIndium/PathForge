@@ -71,18 +71,23 @@ namespace _Game.UI
 
             layout.childAlignment = TextAnchor.MiddleCenter;
             layout.spacing = _heartSpacing;
-            layout.childControlWidth = false;
-            layout.childControlHeight = false;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
+            layout.childScaleWidth = false;
+            layout.childScaleHeight = false;
 
-            foreach (HeartUI heart in _hearts)
+            for (int i = 0; i < _hearts.Count; i++)
             {
+                HeartUI heart = _hearts[i];
                 if (heart == null) continue;
 
                 RectTransform heartRect = heart.GetComponent<RectTransform>();
                 if (heartRect != null)
                 {
+                    heartRect.anchoredPosition = Vector2.zero;
+                    heartRect.localScale = Vector3.one;
                     heartRect.anchorMin = new Vector2(0.5f, 0.5f);
                     heartRect.anchorMax = new Vector2(0.5f, 0.5f);
                     heartRect.pivot = new Vector2(0.5f, 0.5f);
@@ -95,11 +100,19 @@ namespace _Game.UI
                     layoutElement = heart.gameObject.AddComponent<LayoutElement>();
                 }
 
+                layoutElement.ignoreLayout = false;
+                layoutElement.layoutPriority = 1;
                 layoutElement.preferredWidth = _heartSize.x;
                 layoutElement.preferredHeight = _heartSize.y;
+                layoutElement.minWidth = _heartSize.x;
+                layoutElement.minHeight = _heartSize.y;
                 layoutElement.flexibleWidth = 0f;
                 layoutElement.flexibleHeight = 0f;
             }
+
+            layout.enabled = false;
+            layout.enabled = true;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
         }
 
         public void UpdateHearts(int activeLives)
