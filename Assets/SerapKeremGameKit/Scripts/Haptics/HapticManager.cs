@@ -6,7 +6,7 @@ namespace SerapKeremGameKit._Haptics
 {
     public sealed class HapticManager : MonoSingleton<HapticManager>
     {
-        [SerializeField] private bool _enabled = true;
+        [SerializeField] private bool _enabled = false;
         [SerializeField, Range(0f, 1f)] private float _globalIntensity = 1f;
         [SerializeField, Range(0f, 1f)] private float _cooldownSeconds = 0.05f;
 
@@ -15,14 +15,25 @@ namespace SerapKeremGameKit._Haptics
         protected override void Awake()
         {
             base.Awake();
+
             if (Instance != this) return;
-            _enabled = PlayerPrefs.GetInt(PreferencesKeys.SettingsHaptic, 1) == 1;
+
+            // Haptics disabled for mobile build
+            _enabled = false;
+
+            PlayerPrefs.SetInt(PreferencesKeys.SettingsHaptic, 0);
+            PlayerPrefs.Save();
         }
 
         public void SetEnabled(bool isEnabled)
         {
             _enabled = isEnabled;
-            PlayerPrefs.SetInt(PreferencesKeys.SettingsHaptic, _enabled ? 1 : 0);
+
+            PlayerPrefs.SetInt(
+                PreferencesKeys.SettingsHaptic,
+                _enabled ? 1 : 0
+            );
+
             PlayerPrefs.Save();
         }
 
@@ -34,7 +45,9 @@ namespace SerapKeremGameKit._Haptics
         public void Play(HapticType type)
         {
             if (!_enabled) return;
+
             if (Time.unscaledTime < _nextAllowedTime) return;
+
             _nextAllowedTime = Time.unscaledTime + _cooldownSeconds;
 
 #if UNITY_ANDROID || UNITY_IOS
@@ -54,6 +67,7 @@ namespace SerapKeremGameKit._Haptics
                 case HapticType.Light:
                     Handheld.Vibrate();
                     break;
+
                 case HapticType.Medium:
                 case HapticType.Success:
                 case HapticType.Warning:
@@ -61,6 +75,7 @@ namespace SerapKeremGameKit._Haptics
                 case HapticType.Heavy:
                     Handheld.Vibrate();
                     break;
+
                 default:
                     break;
             }
@@ -68,5 +83,3 @@ namespace SerapKeremGameKit._Haptics
 #endif
     }
 }
-
-

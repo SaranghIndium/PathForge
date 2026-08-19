@@ -28,6 +28,8 @@ namespace SerapKeremGameKit._Time
             base.Awake();
             if (Instance != this) return;
 
+            QualitySettings.vSyncCount = 0;// Disable VSync to allow target frame rate control
+
             Application.targetFrameRate = _targetFrameRate;
             SetFixedDeltaTime(_defaultFixedDeltaTime);
             ResetTimeScale();

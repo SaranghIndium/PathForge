@@ -9,6 +9,7 @@ namespace SerapKeremGameKit._UI
     {
         [SerializeField] private TextMeshProUGUI _levelText;
         [SerializeField] private TextMeshProUGUI _timeText;
+        [SerializeField] private Button _pauseButton;
         [SerializeField] private Button _restartButton;
         [SerializeField] private Button _settingsButton;
         [SerializeField] private UIRootController _uiRoot;
@@ -20,6 +21,7 @@ namespace SerapKeremGameKit._UI
         {
             if (_restartButton != null) _restartButton.BindOnClick(this, OnRestartClicked);
             if (_settingsButton != null) _settingsButton.BindOnClick(this, OnSettingsClicked);
+            if (_pauseButton != null) _pauseButton.BindOnClick(this, OnPauseClicked);
         }
 
         public override void Show(bool playSound = true)
@@ -115,6 +117,12 @@ namespace SerapKeremGameKit._UI
         private void OnSettingsClicked()
         {
             if (_uiRoot != null) _uiRoot.OnOpenSettings();
+        }
+
+        private void OnPauseClicked()
+        {
+            if (_uiRoot != null)
+                _uiRoot.OnPauseRequested();
         }
 
         public void SetUIRoot(UIRootController uiRoot)

@@ -9,11 +9,13 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private Image _failIcon;
         [SerializeField] private TextMeshProUGUI _coinText;
         [SerializeField] private Button _restartButton;
+		[SerializeField] private Button _mainMenuButton;
         [SerializeField] private UIRootController _uiRoot;
 
 		private void Awake()
 		{
 			if (_restartButton != null) _restartButton.BindOnClick(this, OnRestartClicked);
+			if (_mainMenuButton != null) _mainMenuButton.BindOnClick(this, OnMainMenuClicked);
 		}
 
 		protected override void OnDestroy()
@@ -32,6 +34,11 @@ namespace SerapKeremGameKit._UI
         {
 			if (_uiRoot != null) _uiRoot.OnRestartConfirmed();
         }
+
+		private void OnMainMenuClicked()
+		{
+			if (_uiRoot != null) _uiRoot.OnMainMenuRequested();
+		}
 
 		public void SetUIRoot(UIRootController uiRoot)
 		{

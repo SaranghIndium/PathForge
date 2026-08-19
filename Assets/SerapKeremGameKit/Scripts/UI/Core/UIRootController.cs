@@ -7,6 +7,7 @@ using UnityEngine;
 using SerapKeremGameKit._Audio;
 using SerapKeremGameKit._Haptics;
 using _Game.UI;
+using UnityEngine.SceneManagement;
 
 namespace SerapKeremGameKit._UI
 {
@@ -18,6 +19,7 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private FailPanel _fail;
         [SerializeField] private SettingsPanel _settings;
         [SerializeField] private RetryPanel _retry;
+        [SerializeField] private PausePanel _pause;
 
         [Header("Data")]
         [SerializeField] private LevelConfig _fallbackConfig;
@@ -40,12 +42,14 @@ namespace SerapKeremGameKit._UI
             if (_fail == null) _fail = GetComponentInChildren<FailPanel>(true);
             if (_settings == null) _settings = GetComponentInChildren<SettingsPanel>(true);
             if (_retry == null) _retry = GetComponentInChildren<RetryPanel>(true);
+            if (_pause == null) _pause = GetComponentInChildren<PausePanel>(true);
 
             // Inject UIRoot into screens to avoid FindObjectOfType
             if (_hud != null) _hud.SetUIRoot(this);
             if (_win != null) _win.SetUIRoot(this);
             if (_fail != null) _fail.SetUIRoot(this);
             if (_retry != null) _retry.SetUIRoot(this);
+            if (_pause != null) _pause.SetUIRoot(this);
 
             // Ensure startup state: only HUD hidden initially (will be shown in Start)
             if (_win != null) _win.HideImmediate();
@@ -53,6 +57,7 @@ namespace SerapKeremGameKit._UI
             if (_settings != null) _settings.HideImmediate();
             if (_retry != null) _retry.HideImmediate();
             if (_hud != null) _hud.HideImmediate();
+            if (_pause != null) _pause.HideImmediate();
         }
 
         private void Start()
@@ -116,6 +121,7 @@ namespace SerapKeremGameKit._UI
             if (_fail != null) _fail.Hide(false);
             if (_settings != null) _settings.Hide(false);
             if (_retry != null) _retry.Hide(false);
+            if (_pause != null) _pause.Hide(false);
         }
 
         private void ShowWin()
@@ -194,6 +200,7 @@ namespace SerapKeremGameKit._UI
             if (_fail != null && _fail != screen) _fail.Hide(true);
             if (_settings != null && _settings != screen) _settings.Hide(true);
             if (_retry != null && _retry != screen) _retry.Hide(true);
+            if (_pause != null && _pause != screen) _pause.Hide(true);
         }
 
         public void OnRestartRequested()
@@ -249,6 +256,20 @@ namespace SerapKeremGameKit._UI
             if (HapticManager.IsInitialized) HapticManager.Instance.Play(HapticType.Selection);
         }
 
+        public void OnPauseRequested()
+        {
+            if (TimeManager.IsInitialized) TimeManager.Instance.Pause();
+
+            if (_pause != null) _pause.Show();
+            if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_keyOnOpenSettings)) AudioManager.Instance.Play(_keyOnOpenSettings);
+            if (HapticManager.IsInitialized) HapticManager.Instance.Play(HapticType.Selection);
+        }
+
+        public void OnResumeRequested()
+        {
+            if (TimeManager.IsInitialized) TimeManager.Instance.Resume();
+            if (_pause != null) _pause.Hide();
+        }
 
         public void UpdateTimeDisplay(float remainingTime)
         {
@@ -268,6 +289,12 @@ namespace SerapKeremGameKit._UI
                 }
                 return null;
             }
+        }
+
+        public void OnMainMenuRequested()
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("MainMenuScene");
         }
     }
 }
