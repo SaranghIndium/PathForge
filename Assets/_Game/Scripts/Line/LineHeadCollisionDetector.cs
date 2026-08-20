@@ -9,6 +9,7 @@ namespace _Game.Line
         public event Action<Collider2D> OnHeadCollision;
         
         private Line _ownLine;
+        private Collider2D _headCollider;
         private bool _isInitialized;
         private bool _hasCollided = false;
 
@@ -21,6 +22,7 @@ namespace _Game.Line
             Collider2D col = GetComponent<Collider2D>();
             if (col != null)
             {
+                _headCollider = col;
                 col.isTrigger = true;
             }
         }
@@ -31,24 +33,50 @@ namespace _Game.Line
             CheckCollision(other);
         }
 
-        public void CheckSweptCollision(Vector2 start, Vector2 end, float radius)
+        public void CheckSweptCollision(Vector2 start, Vector2 end, Collider2D headCollider)
         {
-            if (!_isInitialized || _ownLine == null || _hasCollided) return;
+            if (!_isInitialized || _ownLine == null || _hasCollided || headCollider == null) return;
 
             Vector2 movement = end - start;
             float distance = movement.magnitude;
             if (distance > 0.0001f)
             {
-                RaycastHit2D[] hits = Physics2D.CircleCastAll(start, radius, movement / distance, distance);
-                foreach (RaycastHit2D hit in hits)
+                ContactFilter2D filter = new ContactFilter2D();
+                filter.useTriggers = true;
+                RaycastHit2D[] hits = new RaycastHit2D[32];
+                int hitCount = headCollider.Cast(-movement / distance, filter, hits, distance);
+                for (int i = 0; i < hitCount; i++)
+                {
+                    CheckCollision(hits[i].collider);
+                    if (_hasCollided) return;
+                }
+
+                float sweepRadius = headCollider.bounds.extents.magnitude;
+                RaycastHit2D[] broadPhaseHits = Physics2D.CircleCastAll(
+                    start,
+                    sweepRadius,
+                    movement / distance,
+                    distance);
+                foreach (RaycastHit2D hit in broadPhaseHits)
                 {
                     CheckCollision(hit.collider);
                     if (_hasCollided) return;
                 }
             }
 
-            Collider2D[] overlaps = Physics2D.OverlapCircleAll(end, radius);
-            foreach (Collider2D overlap in overlaps)
+            ContactFilter2D overlapFilter = new ContactFilter2D();
+            overlapFilter.useTriggers = true;
+            Collider2D[] overlaps = new Collider2D[32];
+            int overlapCount = headCollider.Overlap(overlapFilter, overlaps);
+            for (int i = 0; i < overlapCount; i++)
+            {
+                CheckCollision(overlaps[i]);
+                if (_hasCollided) return;
+            }
+
+            float overlapRadius = headCollider.bounds.extents.magnitude;
+            Collider2D[] broadPhaseOverlaps = Physics2D.OverlapCircleAll(end, overlapRadius);
+            foreach (Collider2D overlap in broadPhaseOverlaps)
             {
                 CheckCollision(overlap);
                 if (_hasCollided) return;
@@ -73,12 +101,7 @@ namespace _Game.Line
         {
             if (collider == null) return null;
 
-            Line line = collider.GetComponent<Line>();
-            if (line == null && collider.transform.parent != null)
-            {
-                line = collider.transform.parent.GetComponent<Line>();
-            }
-            return line;
+            return collider.GetComponentInParent<Line>();
         }
 
         public void ResetCollision()

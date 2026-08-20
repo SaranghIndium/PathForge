@@ -12,6 +12,7 @@ namespace _Game.Line
 
         private LineHeadCollisionDetector _collisionDetector;
         private Line _ownLine;
+        private Collider2D _headCollider;
         private bool _isInitialized;
         private Vector2 _previousWorldPosition;
 
@@ -59,13 +60,26 @@ namespace _Game.Line
                 rigidbody.gravityScale = 0f;
             }
 
-            CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
-            if (circleCollider == null)
+            _headCollider = GetComponent<Collider2D>();
+            if (_headCollider == null)
             {
-                circleCollider = gameObject.AddComponent<CircleCollider2D>();
-                circleCollider.radius = 0.3f;
+                CircleCollider2D fallbackCollider = gameObject.AddComponent<CircleCollider2D>();
+                fallbackCollider.radius = 0.3f;
+                _headCollider = fallbackCollider;
             }
-            circleCollider.isTrigger = true;
+
+            PolygonCollider2D polygonCollider = _headCollider as PolygonCollider2D;
+            if (polygonCollider != null && polygonCollider.pathCount == 0)
+            {
+                polygonCollider.SetPath(0, new[]
+                {
+                    new Vector2(-0.28f, -0.2f),
+                    new Vector2(0.28f, -0.2f),
+                    new Vector2(0f, 0.28f)
+                });
+            }
+
+            _headCollider.isTrigger = true;
         }
 
         private void SetupCollisionDetector()
@@ -111,12 +125,10 @@ namespace _Game.Line
             transform.rotation = Quaternion.Euler(0, 0, angle + _rotationOffset);
 
             Physics2D.SyncTransforms();
-            CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
-            if (_collisionDetector != null && circleCollider != null)
+            if (_collisionDetector != null && _headCollider != null)
             {
-                float worldRadius = circleCollider.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y);
                 Vector2 currentWorldPosition = transform.position;
-                _collisionDetector.CheckSweptCollision(_previousWorldPosition, currentWorldPosition, worldRadius);
+                _collisionDetector.CheckSweptCollision(_previousWorldPosition, currentWorldPosition, _headCollider);
                 _previousWorldPosition = currentWorldPosition;
             }
         }
