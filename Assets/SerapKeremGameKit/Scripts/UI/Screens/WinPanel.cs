@@ -2,6 +2,8 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using SerapKeremGameKit._LevelSystem;
+using SerapKeremGameKit._Managers;
 
 namespace SerapKeremGameKit._UI
 {
@@ -17,6 +19,8 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private TextMeshProUGUI _coinText;
         [SerializeField] private TextMeshProUGUI _totalCoinText;
         [SerializeField] private Button _nextButton;
+        [SerializeField] private Button _retryButton;
+        [SerializeField] private Button _mainMenuButton;
         [SerializeField] private UIRootController _uiRoot;
         [SerializeField] private CoinFlyAnimator _coinFly;
         [SerializeField] private RectTransform _totalCoinTarget;
@@ -27,6 +31,8 @@ namespace SerapKeremGameKit._UI
         private void Awake()
         {
 			if (_nextButton != null) _nextButton.BindOnClick(this, OnNextClicked);
+			if (_retryButton != null) _retryButton.BindOnClick(this, OnRetryClicked);
+			if (_mainMenuButton != null) _mainMenuButton.BindOnClick(this, OnMainMenuClicked);
         }
 
 		protected override void OnDestroy()
@@ -47,6 +53,13 @@ namespace SerapKeremGameKit._UI
             if (_totalCoinText != null) _totalCoinText.text = Mathf.Max(0, totalCoins).ToString();
             _uiRoot = uiRoot;
             _pendingReward = rewardedCoins;
+            if (_nextButton != null)
+            {
+                bool isFinalLevel = LevelManager.Instance != null &&
+                                     LevelManager.Instance.GameplayLevelCount > 0 &&
+                                     LevelManager.Instance.ActiveLevelNumber >= LevelManager.Instance.GameplayLevelCount;
+                _nextButton.gameObject.SetActive(!isFinalLevel);
+            }
 
             // Do not start animation here; start it on Next button
         }
@@ -79,6 +92,16 @@ namespace SerapKeremGameKit._UI
                 }
             }
             if (_uiRoot != null) _uiRoot.ProceedNextLevelAfterReward(_pendingReward);
+        }
+
+        private void OnRetryClicked()
+        {
+            if (_uiRoot != null) _uiRoot.OnRestartConfirmed();
+        }
+
+        private void OnMainMenuClicked()
+        {
+            if (_uiRoot != null) _uiRoot.OnMainMenuRequested();
         }
 
 		public void SetUIRoot(UIRootController uiRoot)

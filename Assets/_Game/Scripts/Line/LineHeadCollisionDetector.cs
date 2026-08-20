@@ -31,6 +31,30 @@ namespace _Game.Line
             CheckCollision(other);
         }
 
+        public void CheckSweptCollision(Vector2 start, Vector2 end, float radius)
+        {
+            if (!_isInitialized || _ownLine == null || _hasCollided) return;
+
+            Vector2 movement = end - start;
+            float distance = movement.magnitude;
+            if (distance > 0.0001f)
+            {
+                RaycastHit2D[] hits = Physics2D.CircleCastAll(start, radius, movement / distance, distance);
+                foreach (RaycastHit2D hit in hits)
+                {
+                    CheckCollision(hit.collider);
+                    if (_hasCollided) return;
+                }
+            }
+
+            Collider2D[] overlaps = Physics2D.OverlapCircleAll(end, radius);
+            foreach (Collider2D overlap in overlaps)
+            {
+                CheckCollision(overlap);
+                if (_hasCollided) return;
+            }
+        }
+
         private void CheckCollision(Collider2D other)
         {
             if (other == null || _hasCollided) return;

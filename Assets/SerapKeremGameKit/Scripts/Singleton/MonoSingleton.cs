@@ -20,7 +20,7 @@ namespace SerapKeremGameKit._Singletons
             {
                 if (_instance == null)
                 {
-                    TraceLogger.LogError($"Instance of {typeof(T).Name} is not found in the scene.");
+                    //TraceLogger.LogError($"Instance of {typeof(T).Name} is not found in the scene.");
                 }
                 return _instance;
             }

@@ -13,6 +13,7 @@ namespace _Game.Line
         private LineHeadCollisionDetector _collisionDetector;
         private Line _ownLine;
         private bool _isInitialized;
+        private Vector2 _previousWorldPosition;
 
         public event Action<Collider2D> OnHeadCollision;
         public bool IsInitialized => _isInitialized;
@@ -36,6 +37,7 @@ namespace _Game.Line
             SetupCollisionDetector();
 
             _isInitialized = true;
+            _previousWorldPosition = transform.position;
             enabled = true;
         }
 
@@ -107,6 +109,16 @@ namespace _Game.Line
 
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle + _rotationOffset);
+
+            Physics2D.SyncTransforms();
+            CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
+            if (_collisionDetector != null && circleCollider != null)
+            {
+                float worldRadius = circleCollider.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y);
+                Vector2 currentWorldPosition = transform.position;
+                _collisionDetector.CheckSweptCollision(_previousWorldPosition, currentWorldPosition, worldRadius);
+                _previousWorldPosition = currentWorldPosition;
+            }
         }
 
         private void OnDestroy()
